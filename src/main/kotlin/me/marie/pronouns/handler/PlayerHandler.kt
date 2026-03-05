@@ -8,10 +8,11 @@ import me.marie.pronouns.util.currentInstant
 import me.marie.pronouns.util.modMessage
 import me.marie.pronouns.util.passedSince
 import me.owdding.ktmodules.Module
+import net.minecraft.client.player.AbstractClientPlayer
 import net.minecraft.client.renderer.SubmitNodeCollector
+import net.minecraft.client.renderer.entity.state.AvatarRenderState
 import net.minecraft.client.renderer.entity.state.EntityRenderState
 import net.minecraft.client.renderer.state.CameraRenderState
-import net.minecraft.world.entity.player.Player
 import tech.thatgravyboat.skyblockapi.api.events.base.Subscription
 import tech.thatgravyboat.skyblockapi.api.events.hypixel.ServerChangeEvent
 import tech.thatgravyboat.skyblockapi.api.events.misc.RegisterCommandsEvent
@@ -43,16 +44,18 @@ object PlayerHandler {
     }
 
     fun renderNameTagExtension(renderState: EntityRenderState, poseStack: PoseStack, collector: SubmitNodeCollector, cameraState: CameraRenderState) {
-        val player = renderState.getData(PronounDbIntegration.ENTITY_DATA_KEY) as? Player ?: return
+        val renderState = renderState as? AvatarRenderState ?: return
+        val player = renderState.getData(PronounDbIntegration.ENTITY_DATA_KEY) as? AbstractClientPlayer ?: return
         val id = player.gameProfile.id
 
         if (id.version() != 4) return
 
         poseStack.pushPose()
+        poseStack.translate(0f, 9.0f * (if (renderState.scoreText != null) 2 else 1) * 1.15f * 0.025f, 0f)
         collector.submitNameTag(
             poseStack,
             renderState.nameTagAttachment,
-            0,
+            if (player.showExtraEars()) -10 else 0,
             PronounDbImpl.getPronounExtensionComponent(id),
             !renderState.isDiscrete,
             renderState.lightCoords,
@@ -72,25 +75,6 @@ object PlayerHandler {
         PronounDbImpl.lastRequest = currentInstant()
     }
 
-    /*@Subscription
-    fun onRenderHud(event: RenderHudEvent) {
-        val graphics = event.graphics
-
-        val displayLines = listOf(
-            "Loaded players: ${McLevel.players.size}",
-            "Players to request: ${PronounDbImpl.playersToRequest.size}",
-            "Cached players: ${PronounDbImpl.cache.size}",
-            "Last request: ${PronounDbImpl.lastRequest.passedSince().inWholeMilliseconds}ms ago"
-        )
-
-        val x = graphics.guiWidth() / 2
-        var y = 10
-        displayLines.forEach {
-            graphics.drawCenteredString(McFont.self, it, x, y, -1)
-            y += McFont.height + 2
-        }
-    }*/
-
     @Subscription
     fun onRegisterCommands(event: RegisterCommandsEvent) {
         event.register("pronouns") {
@@ -103,6 +87,10 @@ object PlayerHandler {
                 val size = PronounDbImpl.cache.size
                 PronounDbImpl.cache.clear()
                 modMessage("Cleared $size entries from the pronouns cache.")
+            }
+            thenCallback("debug") {
+                PronounDbIntegration.debug = !PronounDbIntegration.debug
+                modMessage("Toggled debug: ${!PronounDbIntegration.debug} -> ${PronounDbIntegration.debug}")
             }
         }
     }

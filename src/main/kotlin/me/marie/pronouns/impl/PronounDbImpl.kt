@@ -1,12 +1,15 @@
 package me.marie.pronouns.impl
 
 import com.google.gson.JsonObject
+import me.marie.pronouns.PronounDbIntegration
 import me.marie.pronouns.util.*
 import me.owdding.ktmodules.Module
 import net.minecraft.network.chat.Component
 import tech.thatgravyboat.skyblockapi.api.events.base.Subscription
 import tech.thatgravyboat.skyblockapi.api.events.time.TickEvent
-import java.util.UUID
+import tech.thatgravyboat.skyblockapi.utils.text.CommonText
+import tech.thatgravyboat.skyblockapi.utils.text.Text
+import java.util.*
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
@@ -43,8 +46,11 @@ object PronounDbImpl {
         var pronouns = getPronouns(uuid)
         if (pronouns.isEmpty()) pronouns = listOf(Pronouns.ASK)
 
-        val displayNames = pronouns.joinToString(", ") { it.displayName }
-        return Component.literal(" ($displayNames)").withColor(0xFFAAAAAA.toInt())
+        val displayNames = pronouns.map {
+            val debug = if (PronounDbIntegration.debug) Text.of(" (${cache[uuid]?.second?.passedSince()?.inWholeSeconds ?: "N/A"}s old)") else CommonText.EMPTY
+            Text.of(it.displayName, 0xFFAAAAAA.toInt()).append(debug)
+        }
+        return Text.join(displayNames, separator = Text.of(", ", 0xFFAAAAAA.toInt()))
     }
 
     fun getPronouns(uuid: UUID) = getPronouns(uuid.toKotlinUuid())
@@ -142,63 +148,3 @@ object PronounDbImpl {
     }
 
 }
-
-/**
- * Looks up the data saved in PronounDB for one or more (up to 50) account for a given platform.
- *
- * The response is a map of IDs to the corresponding data. If an ID is not in our database, it will not be present in the response.
- *
- * It is strongly recommended to fetch IDs in bulk when possible and applicable, to help prevent hitting and potential rate limits.
- * Request types
- *
- * type RequestParams = {
- * 	// See below for a list of supported platforms
- * 	platform: string
- * 	// Items are separated by ",". Example: 13,27,31
- * 	ids: string[]
- * }
- *
- * type ResponseBody = {
- * 	[userId: string]: {
- * 		// See below for a list of supported sets
- * 		sets: {
- * 			// See below for a list of supported locales
- * 			[locale: string]: string[]
- * 		}
- * 	}
- * }
- *
- * Example request
- *
- * GET /api/v2/lookup?platform=discord&ids=94762492923748352,246652610747039745
- *
- * Example response
- *
- * HTTP/2 200 OK
- * Content-Type: application/json
- *
- * {
- * 	"94762492923748352": {
- * 		"sets": {
- * 			"en": [
- * 				"she",
- * 				"it"
- * 			]
- * 		}
- * 	}
- * }
- *
- * en locale
- *     Nominative
- *         he: he/him
- *         it: it/its
- *         she: she/her
- *         they: they/them
- *     Meta sets
- *         any: Any pronouns
- *         ask: Ask me my pronouns
- *         avoid: Avoid pronouns, use my name
- *         other: Other pronouns
- *
- *
- */

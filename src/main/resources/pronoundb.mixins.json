@@ -8,10 +8,7 @@
   "overwrites": {
     "requireAnnotations": true
   },
-  "mixins": [
-    "PlayerMixin"
-  ],
   "client": [
-    "EntityRendererMixin"
+    "AvatarRendererMixin"
   ]
 }

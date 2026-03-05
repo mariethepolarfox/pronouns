@@ -1,6 +1,7 @@
 package me.marie.pronouns
 
 import me.marie.pronouns.generated.PronounsModules
+import me.owdding.ktmodules.Module
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.client.rendering.v1.RenderStateDataKey
 import net.minecraft.world.entity.Entity
@@ -9,9 +10,11 @@ import org.apache.logging.log4j.Logger
 import tech.thatgravyboat.skyblockapi.api.SkyBlockAPI
 import kotlin.uuid.ExperimentalUuidApi
 
+@Module
 @OptIn(ExperimentalUuidApi::class)
 object PronounDbIntegration : ModInitializer {
 	val logger: Logger = LogManager.getLogger("PronounDbIntegration")
+	var debug = false
 
 	override fun onInitialize() {
 		logger.info("Meow :3")
