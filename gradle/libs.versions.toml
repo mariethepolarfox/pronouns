@@ -1,0 +1,43 @@
+[versions]
+
+minecraft = "1.21.10"
+loom = "1.15-SNAPSHOT"
+loader = "0.18.4"
+
+fabric = "0.138.4+1.21.10"
+fabrickotlin = "1.13.9+kotlin.2.3.10"
+
+meowdding-ktmodules = "1.0.8"
+skyblockapi = "4.0.9"
+hypixel-modapi-fabric = "1.0.1+build.1+mc1.21"
+
+kotlin = "2.3.10"
+ksp = "2.3.6"
+google-gson = "2.13.2"
+
+devauth = "1.2.2"
+
+[libraries]
+
+minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }
+loader = { module = "net.fabricmc:fabric-loader", version.ref = "loader" }
+fabric = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fabric" }
+fabrickotlin = { module = "net.fabricmc:fabric-language-kotlin", version.ref = "fabrickotlin" }
+
+skyblockapi = { module = "tech.thatgravyboat:skyblock-api", version.ref = "skyblockapi" }
+meowdding-ktmodules = { module = "me.owdding.ktmodules:KtModules", version.ref = "meowdding-ktmodules" }
+hypixel-modapi-fabric = { module = "maven.modrinth:hypixel-mod-api", version.ref = "hypixel-modapi-fabric" }
+
+google-gson = { module = "com.google.code.gson:gson", version.ref = "google-gson" }
+
+devauth = { module = "me.djtheredstoner:DevAuth-fabric", version.ref = "devauth" }
+
+[bundles]
+
+fabric = ["loader", "fabric", "fabrickotlin"]
+
+[plugins]
+
+loom = { id = "net.fabricmc.fabric-loom-remap", version.ref = "loom" }
+kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
