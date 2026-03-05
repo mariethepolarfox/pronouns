@@ -1,17 +1,21 @@
 package me.marie.pronouns.handler
 
 import com.mojang.authlib.GameProfile
+import com.mojang.blaze3d.vertex.PoseStack
+import me.marie.pronouns.PronounDbIntegration
 import me.marie.pronouns.impl.PronounDbImpl
 import me.marie.pronouns.util.currentInstant
 import me.marie.pronouns.util.modMessage
 import me.marie.pronouns.util.passedSince
 import me.owdding.ktmodules.Module
+import net.minecraft.client.renderer.SubmitNodeCollector
+import net.minecraft.client.renderer.entity.state.EntityRenderState
+import net.minecraft.client.renderer.state.CameraRenderState
+import net.minecraft.world.entity.player.Player
 import tech.thatgravyboat.skyblockapi.api.events.base.Subscription
 import tech.thatgravyboat.skyblockapi.api.events.hypixel.ServerChangeEvent
 import tech.thatgravyboat.skyblockapi.api.events.misc.RegisterCommandsEvent
-import tech.thatgravyboat.skyblockapi.api.events.render.RenderHudEvent
 import tech.thatgravyboat.skyblockapi.api.events.time.TickEvent
-import tech.thatgravyboat.skyblockapi.helpers.McFont
 import tech.thatgravyboat.skyblockapi.helpers.McLevel
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.toJavaUuid
@@ -36,6 +40,26 @@ object PlayerHandler {
 
     fun onTablistUpdate(profiles: List<GameProfile>) {
         queueUncachedPlayers(profiles)
+    }
+
+    fun renderNameTagExtension(renderState: EntityRenderState, poseStack: PoseStack, collector: SubmitNodeCollector, cameraState: CameraRenderState) {
+        val player = renderState.getData(PronounDbIntegration.ENTITY_DATA_KEY) as? Player ?: return
+        val id = player.gameProfile.id
+
+        if (id.version() != 4) return
+
+        poseStack.pushPose()
+        collector.submitNameTag(
+            poseStack,
+            renderState.nameTagAttachment,
+            0,
+            PronounDbImpl.getPronounExtensionComponent(id),
+            !renderState.isDiscrete,
+            renderState.lightCoords,
+            renderState.distanceToCameraSq,
+            cameraState
+        )
+        poseStack.popPose()
     }
 
     @Subscription(TickEvent::class)
