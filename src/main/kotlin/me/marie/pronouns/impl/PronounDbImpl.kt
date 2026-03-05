@@ -42,9 +42,8 @@ object PronounDbImpl {
 
     fun getPronounExtensionComponent(uuid: UUID) = getPronounExtensionComponent(uuid.toKotlinUuid())
 
-    fun getPronounExtensionComponent(uuid: Uuid): Component {
-        var pronouns = getPronouns(uuid)
-        if (pronouns.isEmpty()) pronouns = listOf(Pronouns.ASK)
+    fun getPronounExtensionComponent(uuid: Uuid): Component? {
+        val pronouns = getPronouns(uuid).takeUnless { it == listOf(Pronouns.ASK) } ?: return null
 
         val displayNames = pronouns.map {
             val debug = if (PronounDbIntegration.debug) Text.of(" (${cache[uuid]?.second?.passedSince()?.inWholeSeconds ?: "N/A"}s old)") else CommonText.EMPTY
@@ -55,11 +54,11 @@ object PronounDbImpl {
 
     fun getPronouns(uuid: UUID) = getPronouns(uuid.toKotlinUuid())
 
-    fun getPronouns(uuid: Uuid): List<Pronouns> {
-        val cached = cache[uuid] ?: return listOf(Pronouns.ASK)
+    fun getPronouns(uuid: Uuid): List<Pronouns>? {
+        val cached = cache[uuid] ?: return null
         if (cached.second.passedSince() >= CACHE_TIMEOUT) {
             cache.remove(uuid)
-            return listOf(Pronouns.ASK)
+            return null
         }
 
         return cached.first

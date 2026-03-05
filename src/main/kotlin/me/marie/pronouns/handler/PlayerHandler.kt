@@ -50,13 +50,15 @@ object PlayerHandler {
 
         if (id.version() != 4) return
 
+        val comp = PronounDbImpl.getPronounExtensionComponent(id) ?: return
+
         poseStack.pushPose()
         poseStack.translate(0f, 9.0f * (if (renderState.scoreText != null) 2 else 1) * 1.15f * 0.025f, 0f)
         collector.submitNameTag(
             poseStack,
             renderState.nameTagAttachment,
             if (player.showExtraEars()) -10 else 0,
-            PronounDbImpl.getPronounExtensionComponent(id),
+            comp,
             !renderState.isDiscrete,
             renderState.lightCoords,
             renderState.distanceToCameraSq,
