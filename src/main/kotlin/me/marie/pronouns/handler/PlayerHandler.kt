@@ -81,6 +81,7 @@ object PlayerHandler {
     fun onRegisterCommands(event: RegisterCommandsEvent) {
         event.register("pronouns") {
             thenCallback("printcache") {
+                modMessage("Cached: ${PronounDbImpl.cache.size}, last request: ${PronounDbImpl.lastRequest.passedSince().inWholeSeconds}s ago")
                 PronounDbImpl.cache.forEach { (uuid, pair) ->
                     println("UUID: $uuid, Pronouns: ${pair.first.joinToString(", ")}, Cached for: ${pair.second.passedSince().inWholeSeconds} seconds")
                 }
@@ -89,10 +90,6 @@ object PlayerHandler {
                 val size = PronounDbImpl.cache.size
                 PronounDbImpl.cache.clear()
                 modMessage("Cleared $size entries from the pronouns cache.")
-            }
-            thenCallback("debug") {
-                PronounDbIntegration.debug = !PronounDbIntegration.debug
-                modMessage("Toggled debug: ${!PronounDbIntegration.debug} -> ${PronounDbIntegration.debug}")
             }
         }
     }

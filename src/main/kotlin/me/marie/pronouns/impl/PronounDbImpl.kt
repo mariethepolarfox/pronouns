@@ -43,7 +43,7 @@ object PronounDbImpl {
     fun getPronounExtensionComponent(uuid: UUID) = getPronounExtensionComponent(uuid.toKotlinUuid())
 
     fun getPronounExtensionComponent(uuid: Uuid): Component? {
-        val pronouns = getPronouns(uuid).takeUnless { it == listOf(Pronouns.ASK) } ?: return null
+        val pronouns = getPronouns(uuid).takeUnless { it == listOf(Pronouns.UNKNOWN) } ?: return null
 
         val displayNames = pronouns.map {
             val debug = if (PronounDbIntegration.debug) Text.of(" (${cache[uuid]?.second?.passedSince()?.inWholeSeconds ?: "N/A"}s old)") else CommonText.EMPTY
@@ -103,13 +103,13 @@ object PronounDbImpl {
                     emptyList()
                 }
 
-                cache[uuid] = Pair(pronouns.ifEmpty { listOf(Pronouns.ASK) }, now)
+                cache[uuid] = Pair(pronouns.ifEmpty { listOf(Pronouns.UNKNOWN) }, now)
                 receivedUuids.add(uuid)
             }
 
             val missingUuids = uuids.filterNot { it in receivedUuids }
             missingUuids.forEach { uuid ->
-                cache[uuid] = Pair(listOf(Pronouns.ASK), now)
+                cache[uuid] = Pair(listOf(Pronouns.UNKNOWN), now)
             }
 
             val foundCount = receivedUuids.size
@@ -118,7 +118,7 @@ object PronounDbImpl {
 
             println("Fetched pronoun data for $foundCount/$totalCount UUID(s) from PronounDB")
             if (missingCount > 0) {
-                println("Cached $missingCount UUID(s) as ASK (not found in PronounDB)")
+                println("Cached $missingCount UUID(s) as UNKNOWN (not found in PronounDB)")
             }
 
             val message = if (missingCount > 0) {
@@ -143,6 +143,7 @@ object PronounDbImpl {
         ASK("ask"),
         AVOID("name"),
         OTHER("other"),
+        UNKNOWN(""),
         ;
     }
 
