@@ -7,6 +7,8 @@ import me.owdding.ktmodules.Module
 import net.minecraft.network.chat.Component
 import tech.thatgravyboat.skyblockapi.api.events.base.Subscription
 import tech.thatgravyboat.skyblockapi.api.events.time.TickEvent
+import tech.thatgravyboat.skyblockapi.utils.extentions.currentInstant
+import tech.thatgravyboat.skyblockapi.utils.extentions.since
 import tech.thatgravyboat.skyblockapi.utils.text.CommonText
 import tech.thatgravyboat.skyblockapi.utils.text.Text
 import java.util.*
@@ -29,7 +31,7 @@ object PronounDbImpl {
     @Subscription(TickEvent::class)
     fun onTick() {
         if (playersToRequest.isEmpty()) return
-        if (lastRequest.passedSince() < REQUEST_INTERVAL) return
+        if (lastRequest.since() < REQUEST_INTERVAL) return
 
         lastRequest = currentInstant()
 
@@ -44,7 +46,8 @@ object PronounDbImpl {
         val pronouns = getPronouns(uuid).takeUnless { it == listOf(Pronouns.UNKNOWN) } ?: return null
 
         val displayNames = pronouns.map {
-            val debug = if (PronounDbIntegration.debug) Text.of(" (${cache[uuid]?.second?.passedSince()?.inWholeSeconds ?: "N/A"}s old)") else CommonText.EMPTY
+            val debug =
+                if (PronounDbIntegration.debug) Text.of(" (${cache[uuid]?.second?.since()?.inWholeSeconds ?: "N/A"}s old)") else CommonText.EMPTY
             Text.of(it.displayName, 0xFFAAAAAA.toInt()).append(debug)
         }
         return Text.join(displayNames, separator = Text.of(", ", 0xFFAAAAAA.toInt()))
@@ -54,7 +57,7 @@ object PronounDbImpl {
 
     fun getPronouns(uuid: Uuid): List<Pronouns>? {
         val cached = cache[uuid] ?: return null
-        if (cached.second.passedSince() >= CACHE_TIMEOUT) {
+        if (cached.second.since() >= CACHE_TIMEOUT) {
             cache.remove(uuid)
             return null
         }
@@ -66,7 +69,7 @@ object PronounDbImpl {
 
     fun isCached(uuid: Uuid): Boolean {
         val cached = cache[uuid] ?: return false
-        return cached.second.passedSince() < CACHE_TIMEOUT
+        return cached.second.since() < CACHE_TIMEOUT
     }
 
     fun getData(uuids: List<Uuid>) {
