@@ -46,8 +46,7 @@ object PronounDbImpl {
         val pronouns = getPronouns(uuid).takeUnless { it == listOf(Pronouns.UNKNOWN) } ?: return null
 
         val displayNames = pronouns.map {
-            val debug =
-                if (PronounDbIntegration.debug) Text.of(" (${cache[uuid]?.second?.since()?.inWholeSeconds ?: "N/A"}s old)") else CommonText.EMPTY
+            val debug = if (PronounDbIntegration.debug) Text.of(" (${cache[uuid]?.second?.since()?.inWholeSeconds ?: "N/A"}s old)") else CommonText.EMPTY
             Text.of(it.displayName, 0xFFAAAAAA.toInt()).append(debug)
         }
         return Text.join(displayNames, separator = Text.of(", ", 0xFFAAAAAA.toInt()))
@@ -76,7 +75,7 @@ object PronounDbImpl {
         Multithreading.launch {
             val result = RequestUtil.fetchJson<JsonObject>(buildRequestUrl(uuids))
             val data = result.getOrNull() ?: run {
-                modMessage("Failed to fetch pronoun data for ${uuids.size} UUID(s) (see log for details)")
+                "Failed to fetch pronoun data for ${uuids.size} UUID(s) (see log for details)".sendPrefixed()
                 return@launch
             }
 

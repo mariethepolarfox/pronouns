@@ -1,19 +1,10 @@
 package me.marie.pronouns.util
 
 import net.minecraft.network.chat.Component
-import tech.thatgravyboat.skyblockapi.helpers.McClient
+import tech.thatgravyboat.skyblockapi.utils.text.Text
+import tech.thatgravyboat.skyblockapi.utils.text.Text.send
 
-fun modMessage(message: String) {
-    appendChatMessage(
-        Component.literal("[PronounDB] ").withColor(0xFFAAAAAA.toInt())
-            .append(
-                Component.literal(message)
-            )
-    )
-}
+private val PREFIX = Text.of("[PronounDB] ", 0xFFAAAAAA.toInt())
 
-fun appendChatMessage(message: Component) {
-    McClient.runOrNextTick {
-        McClient.chat.addMessage(message)
-    }
-}
+fun String.sendPrefixed() = Text.of(this).sendPrefixed()
+fun Component.sendPrefixed() = PREFIX.copy().append(this).send()

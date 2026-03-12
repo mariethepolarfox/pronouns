@@ -4,7 +4,7 @@ import com.mojang.authlib.GameProfile
 import com.mojang.blaze3d.vertex.PoseStack
 import me.marie.pronouns.PronounDbIntegration
 import me.marie.pronouns.impl.PronounDbImpl
-import me.marie.pronouns.util.modMessage
+import me.marie.pronouns.util.sendPrefixed
 import me.owdding.ktmodules.Module
 import net.minecraft.client.player.AbstractClientPlayer
 import net.minecraft.client.renderer.SubmitNodeCollector
@@ -84,7 +84,7 @@ object PlayerHandler {
     fun onRegisterCommands(event: RegisterCommandsEvent) {
         event.register("pronouns") {
             thenCallback("printcache") {
-                modMessage("Cached: ${PronounDbImpl.cache.size}, last request: ${PronounDbImpl.lastRequest.since().inWholeSeconds}s ago")
+                "Cached: ${PronounDbImpl.cache.size}, last request: ${PronounDbImpl.lastRequest.since().inWholeSeconds}s ago".sendPrefixed()
                 PronounDbImpl.cache.forEach { (uuid, pair) ->
                     println("UUID: $uuid, Pronouns: ${pair.first.joinToString(", ")}, Cached for: ${pair.second.since().inWholeSeconds} seconds")
                 }
@@ -92,7 +92,7 @@ object PlayerHandler {
             thenCallback("invalidateCache") {
                 val size = PronounDbImpl.cache.size
                 PronounDbImpl.cache.clear()
-                modMessage("Cleared $size entries from the pronouns cache.")
+                "Cleared $size entries from the pronouns cache.".sendPrefixed()
             }
         }
     }
