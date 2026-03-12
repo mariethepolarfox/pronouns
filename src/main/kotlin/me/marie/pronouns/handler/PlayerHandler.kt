@@ -45,7 +45,7 @@ object PlayerHandler {
         renderState: EntityRenderState,
         poseStack: PoseStack,
         collector: SubmitNodeCollector,
-        cameraState: CameraRenderState
+        cameraState: CameraRenderState,
     ) {
         val renderState = renderState as? AvatarRenderState ?: return
         val player = renderState.getData(PronounDbIntegration.ENTITY_DATA_KEY) as? AbstractClientPlayer ?: return
@@ -65,7 +65,7 @@ object PlayerHandler {
             !renderState.isDiscrete,
             renderState.lightCoords,
             renderState.distanceToCameraSq,
-            cameraState
+            cameraState,
         )
         poseStack.popPose()
     }
@@ -85,8 +85,8 @@ object PlayerHandler {
         event.register("pronouns") {
             thenCallback("printcache") {
                 "Cached: ${PronounDbImpl.cache.size}, last request: ${PronounDbImpl.lastRequest.since().inWholeSeconds}s ago".sendPrefixed()
-                PronounDbImpl.cache.forEach { (uuid, pair) ->
-                    println("UUID: $uuid, Pronouns: ${pair.first.joinToString(", ")}, Cached for: ${pair.second.since().inWholeSeconds} seconds")
+                PronounDbImpl.cache.forEach { (uuid, data) ->
+                    println("UUID: $uuid, Pronouns: ${data.pronouns.joinToString(", ")}, Decoration: ${data.decoration}, Cached for: ${data.since().inWholeSeconds} seconds")
                 }
             }
             thenCallback("invalidateCache") {
