@@ -5,10 +5,8 @@ import tech.thatgravyboat.skyblockapi.api.events.base.Subscription
 import tech.thatgravyboat.skyblockapi.api.events.info.TabListChangeEvent
 import tech.thatgravyboat.skyblockapi.helpers.McClient
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
-import kotlin.uuid.ExperimentalUuidApi
 
 @Module
-@OptIn(ExperimentalUuidApi::class)
 object TablistHandler {
     private val playerRegex = "\\[(?<level>\\d+)] (?<name>[\\w_-]+).*".toRegex()
 

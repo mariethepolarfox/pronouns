@@ -94,6 +94,7 @@ tasks.withType<KotlinCompile>().configureEach {
 	compilerOptions {
 		freeCompilerArgs.addAll(
 			"-opt-in=kotlin.time.ExperimentalTime",
+			"-opt-in=kotlin.uuid.ExperimentalUuidApi",
 			"-Xcontext-parameters",
 			"-Xcontext-sensitive-resolution",
 			"-Xnested-type-aliases"

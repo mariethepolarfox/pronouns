@@ -11,10 +11,8 @@ import org.apache.logging.log4j.Logger
 import tech.thatgravyboat.skyblockapi.api.SkyBlockAPI
 import tech.thatgravyboat.skyblockapi.api.events.base.Subscription
 import tech.thatgravyboat.skyblockapi.api.events.misc.RegisterCommandsEvent
-import kotlin.uuid.ExperimentalUuidApi
 
 @Module
-@OptIn(ExperimentalUuidApi::class)
 object PronounDbIntegration : ModInitializer {
 	val logger: Logger = LogManager.getLogger("PronounDbIntegration")
 	var debug = false

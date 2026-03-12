@@ -13,12 +13,10 @@ import java.util.*
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
-import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 import kotlin.uuid.toKotlinUuid
 
 @Module
-@OptIn(ExperimentalUuidApi::class)
 object PronounDbImpl {
     val CACHE_TIMEOUT = 60.minutes
     val cache = mutableMapOf<Uuid, Pair<List<Pronouns>, Instant>>()
