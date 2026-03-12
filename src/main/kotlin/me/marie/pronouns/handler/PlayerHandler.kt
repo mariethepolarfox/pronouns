@@ -4,9 +4,7 @@ import com.mojang.authlib.GameProfile
 import com.mojang.blaze3d.vertex.PoseStack
 import me.marie.pronouns.PronounDbIntegration
 import me.marie.pronouns.impl.PronounDbImpl
-import me.marie.pronouns.util.currentInstant
-import me.marie.pronouns.util.modMessage
-import me.marie.pronouns.util.passedSince
+import me.marie.pronouns.util.sendPrefixed
 import me.owdding.ktmodules.Module
 import net.minecraft.client.player.AbstractClientPlayer
 import net.minecraft.client.renderer.SubmitNodeCollector
@@ -18,12 +16,12 @@ import tech.thatgravyboat.skyblockapi.api.events.hypixel.ServerChangeEvent
 import tech.thatgravyboat.skyblockapi.api.events.misc.RegisterCommandsEvent
 import tech.thatgravyboat.skyblockapi.api.events.time.TickEvent
 import tech.thatgravyboat.skyblockapi.helpers.McLevel
-import kotlin.uuid.ExperimentalUuidApi
+import tech.thatgravyboat.skyblockapi.utils.extentions.currentInstant
+import tech.thatgravyboat.skyblockapi.utils.extentions.since
 import kotlin.uuid.toJavaUuid
 import kotlin.uuid.toKotlinUuid
 
 @Module
-@OptIn(ExperimentalUuidApi::class)
 object PlayerHandler {
 
     private fun queueUncachedPlayers(profiles: List<GameProfile>) {
@@ -43,7 +41,12 @@ object PlayerHandler {
         queueUncachedPlayers(profiles)
     }
 
-    fun renderNameTagExtension(renderState: EntityRenderState, poseStack: PoseStack, collector: SubmitNodeCollector, cameraState: CameraRenderState) {
+    fun renderNameTagExtension(
+        renderState: EntityRenderState,
+        poseStack: PoseStack,
+        collector: SubmitNodeCollector,
+        cameraState: CameraRenderState
+    ) {
         val renderState = renderState as? AvatarRenderState ?: return
         val player = renderState.getData(PronounDbIntegration.ENTITY_DATA_KEY) as? AbstractClientPlayer ?: return
         val id = player.gameProfile.id
@@ -81,15 +84,15 @@ object PlayerHandler {
     fun onRegisterCommands(event: RegisterCommandsEvent) {
         event.register("pronouns") {
             thenCallback("printcache") {
-                modMessage("Cached: ${PronounDbImpl.cache.size}, last request: ${PronounDbImpl.lastRequest.passedSince().inWholeSeconds}s ago")
+                "Cached: ${PronounDbImpl.cache.size}, last request: ${PronounDbImpl.lastRequest.since().inWholeSeconds}s ago".sendPrefixed()
                 PronounDbImpl.cache.forEach { (uuid, pair) ->
-                    println("UUID: $uuid, Pronouns: ${pair.first.joinToString(", ")}, Cached for: ${pair.second.passedSince().inWholeSeconds} seconds")
+                    println("UUID: $uuid, Pronouns: ${pair.first.joinToString(", ")}, Cached for: ${pair.second.since().inWholeSeconds} seconds")
                 }
             }
             thenCallback("invalidateCache") {
                 val size = PronounDbImpl.cache.size
                 PronounDbImpl.cache.clear()
-                modMessage("Cleared $size entries from the pronouns cache.")
+                "Cleared $size entries from the pronouns cache.".sendPrefixed()
             }
         }
     }
