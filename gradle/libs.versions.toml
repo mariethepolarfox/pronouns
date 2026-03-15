@@ -9,7 +9,7 @@ fabrickotlin = "1.13.9+kotlin.2.3.10"
 
 meowdding-ktmodules = "1.0.8"
 skyblockapi = "4.0.9"
-meowdding-lib = "4.0.8"
+meowdding-lib = "4.0.9"
 hypixel-modapi-fabric = "1.0.1+build.1+mc1.21"
 
 resourceful-lib = "3.9.1"

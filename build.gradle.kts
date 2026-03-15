@@ -29,6 +29,7 @@ repositories {
 	maven("https://api.modrinth.com/maven")
 	maven("https://maven.nucleoid.xyz/")
 	mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
