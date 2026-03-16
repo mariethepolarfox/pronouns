@@ -27,7 +27,9 @@ repositories {
 	maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
 	maven("https://repo.hypixel.net/repository/Hypixel")
 	maven("https://api.modrinth.com/maven")
+	maven("https://maven.nucleoid.xyz/")
 	mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
@@ -41,6 +43,18 @@ dependencies {
 	include(libs.skyblockapi) {
 		capabilities { requireCapability("tech.thatgravyboat:skyblock-api-${libs.versions.minecraft.get()}-remapped") }
 	}
+    api(libs.meowdding.lib) {
+        capabilities { requireCapability("me.owdding.meowdding-lib:meowdding-lib-${libs.versions.minecraft.get()}") }
+    }
+    include(libs.meowdding.lib) {
+        capabilities { requireCapability("me.owdding.meowdding-lib:meowdding-lib-${libs.versions.minecraft.get()}-remapped") }
+    }
+
+    // All needed for mlib rn ?????????
+    includeImplementation(libs.resourceful.config)
+    includeImplementation(libs.resourceful.lib)
+    includeImplementation(libs.placeholders)
+    includeImplementation(libs.olympus)
 
 	modRuntimeOnly(libs.hypixel.modapi.fabric)
 
@@ -50,6 +64,11 @@ dependencies {
 	ksp(libs.meowdding.ktmodules)
 
 	modRuntimeOnly(libs.devauth)
+}
+
+fun DependencyHandler.includeImplementation(dep: Any) {
+    include(dep)
+    modImplementation(dep)
 }
 
 ksp {
