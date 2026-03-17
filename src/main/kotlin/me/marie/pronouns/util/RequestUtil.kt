@@ -10,7 +10,7 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 
 object RequestUtil {
-    private const val USER_AGENT = "PronounDBIntegrationMod/0.0.1 (https://github.com/mariethepolarfox/pronouns)"
+    private val USER_AGENT = "PronounDBIntegrationMod/${PronounDbIntegration.version.friendlyString} (https://github.com/mariethepolarfox/pronouns)"
 
     val gson: Gson = GsonBuilder().create()
     private val client = HttpClient.newBuilder().build()

@@ -9,7 +9,6 @@ import me.owdding.ktmodules.Module
 import me.owdding.lib.rendering.text.builtin.GradientTextShader
 import me.owdding.lib.rendering.text.textShader
 import net.minecraft.network.chat.Component
-import org.apache.commons.lang3.time.DurationUtils.since
 import tech.thatgravyboat.skyblockapi.api.events.base.Subscription
 import tech.thatgravyboat.skyblockapi.api.events.time.TickEvent
 import tech.thatgravyboat.skyblockapi.utils.extentions.currentInstant
@@ -17,7 +16,6 @@ import tech.thatgravyboat.skyblockapi.utils.extentions.since
 import tech.thatgravyboat.skyblockapi.utils.json.getPath
 import tech.thatgravyboat.skyblockapi.utils.text.CommonText
 import tech.thatgravyboat.skyblockapi.utils.text.Text
-import tech.thatgravyboat.skyblockapi.utils.text.Text.send
 import java.util.*
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
