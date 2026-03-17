@@ -1,9 +1,40 @@
+
+rootProject.name = "Pronouns"
+
 pluginManagement {
-	repositories {
-		maven("https://maven.fabricmc.net/") {
-			name = "Fabric"
-		}
-		gradlePluginPortal()
-		maven(url = "https://maven.teamresourceful.com/repository/maven-public/")
-	}
+    repositories {
+        mavenCentral()
+        maven("https://maven.fabricmc.net/")
+        maven("https://maven.kikugie.dev/snapshots")
+        gradlePluginPortal()
+    }
+}
+
+plugins {
+    id("dev.kikugie.stonecutter") version "0.9-beta.1"
+}
+
+val versions = listOf("1.21.11", "1.21.10")
+
+stonecutter {
+    create(rootProject) {
+        versions(versions)
+        vcsVersion = versions.first()
+    }
+}
+
+
+dependencyResolutionManagement {
+    versionCatalogs {
+        versions.forEach { version ->
+            val versionName = version.replace('.', '_')
+            create("libs${versionName.replace("_", "")}") {
+                from(
+                    files(
+                        rootProject.projectDir.resolve("gradle/$versionName.versions.toml")
+                    )
+                )
+            }
+        }
+    }
 }

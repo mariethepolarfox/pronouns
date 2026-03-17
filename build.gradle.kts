@@ -1,12 +1,12 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.gradle.api.tasks.compile.JavaCompile
 
 plugins {
+    java
 	idea
 	alias(libs.plugins.loom)
 	alias(libs.plugins.kotlin)
 	alias(libs.plugins.ksp)
+    `versioned-catalogues`
 }
 
 version = project.property("mod_version") as String
@@ -33,28 +33,31 @@ repositories {
 }
 
 dependencies {
-	minecraft(libs.minecraft)
+	minecraft(versionedCatalog["minecraft"])
 	mappings(loom.officialMojangMappings())
+    // loader + fabric kotlin
 	modImplementation(libs.bundles.fabric)
+    // fabricapi
+    modImplementation(versionedCatalog["fabric"])
 
 	api(libs.skyblockapi) {
-		capabilities { requireCapability("tech.thatgravyboat:skyblock-api-${libs.versions.minecraft.get()}") }
+		capabilities { requireCapability("tech.thatgravyboat:skyblock-api-${stonecutter.current.version}") }
 	}
 	include(libs.skyblockapi) {
-		capabilities { requireCapability("tech.thatgravyboat:skyblock-api-${libs.versions.minecraft.get()}-remapped") }
+		capabilities { requireCapability("tech.thatgravyboat:skyblock-api-${stonecutter.current.version}-remapped") }
 	}
     api(libs.meowdding.lib) {
-        capabilities { requireCapability("me.owdding.meowdding-lib:meowdding-lib-${libs.versions.minecraft.get()}") }
+        capabilities { requireCapability("me.owdding.meowdding-lib:meowdding-lib-${stonecutter.current.version}") }
     }
     include(libs.meowdding.lib) {
-        capabilities { requireCapability("me.owdding.meowdding-lib:meowdding-lib-${libs.versions.minecraft.get()}-remapped") }
+        capabilities { requireCapability("me.owdding.meowdding-lib:meowdding-lib-${stonecutter.current.version}-remapped") }
     }
 
     // All needed for mlib rn ?????????
-    includeImplementation(libs.resourceful.config)
-    includeImplementation(libs.resourceful.lib)
-    includeImplementation(libs.placeholders)
-    includeImplementation(libs.olympus)
+    includeImplementation(versionedCatalog["resourceful.lib"])
+    includeImplementation(versionedCatalog["resourceful.config"])
+    includeImplementation(versionedCatalog["placeholders"])
+    includeImplementation(versionedCatalog["olympus"])
 
 	modRuntimeOnly(libs.hypixel.modapi.fabric)
 
@@ -72,25 +75,8 @@ fun DependencyHandler.includeImplementation(dep: Any) {
 }
 
 ksp {
-	arg("meowdding.modules.project_name", project.name)
+	arg("meowdding.modules.project_name", "Pronouns")
 	arg("meowdding.modules.package", "me.marie.pronouns.generated")
-}
-
-tasks.processResources {
-	inputs.property("version", project.version)
-
-	inputs.property("minecraft_version", libs.versions.minecraft.get())
-	inputs.property("loader_version", libs.versions.loader.get())
-	filteringCharset = "UTF-8"
-
-	filesMatching("fabric.mod.json") {
-		expand(
-			"version" to project.version,
-			"minecraft_version" to libs.versions.minecraft.get(),
-			"loader_version" to libs.versions.loader.get(),
-			"kotlin_loader_version" to libs.versions.fabrickotlin.get()
-		)
-	}
 }
 
 loom {
@@ -102,31 +88,64 @@ loom {
 	}
 }
 
-tasks.withType<JavaCompile>().configureEach {
-	options.encoding = "UTF-8"
-	options.release.set(targetJavaVersion)
+tasks {
+    processResources {
+        inputs.property("version", project.version)
+
+        inputs.property("minecraft_version", versionedCatalog.versions["minecraft"])
+        inputs.property("loader_version", libs.versions.loader.get())
+        filteringCharset = "UTF-8"
+
+        filesMatching("fabric.mod.json") {
+            expand(
+                "version" to project.version,
+                "minecraft_version" to versionedCatalog.versions["minecraft"],
+                "loader_version" to libs.versions.loader.get(),
+                "kotlin_loader_version" to libs.versions.fabrickotlin.get()
+            )
+        }
+    }
+
+    jar {
+        from("LICENSE")
+    }
+
+    compileKotlin {
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_21
+            freeCompilerArgs.addAll(
+                "-opt-in=kotlin.time.ExperimentalTime",
+                "-opt-in=kotlin.uuid.ExperimentalUuidApi",
+                "-Xcontext-parameters",
+                "-Xcontext-sensitive-resolution",
+                "-Xnested-type-aliases"
+            )
+        }
+    }
+
+    build {
+        doLast {
+            val sourceFile = rootProject.projectDir.resolve("versions/${project.name}/build/libs/pronoundb-$version.jar")
+            val targetFile = rootProject.projectDir.resolve("build/libs/pronouns-$version-${stonecutter.current.version}.jar")
+            targetFile.parentFile.mkdirs()
+            targetFile.writeBytes(sourceFile.readBytes())
+        }
+    }
 }
 
-
-tasks.withType<KotlinCompile>().configureEach {
-	compilerOptions.jvmTarget.set(JvmTarget.fromTarget(targetJavaVersion.toString()))
-	compilerOptions {
-		freeCompilerArgs.addAll(
-			"-opt-in=kotlin.time.ExperimentalTime",
-			"-opt-in=kotlin.uuid.ExperimentalUuidApi",
-			"-Xcontext-parameters",
-			"-Xcontext-sensitive-resolution",
-			"-Xnested-type-aliases"
-		)
-	}
+java {
+    withSourcesJar()
+    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_21
 }
 
-tasks.withType<Jar> {
-	duplicatesStrategy = DuplicatesStrategy.INCLUDE
+kotlin {
+    jvmToolchain(21)
 }
 
-tasks.jar {
-	from("LICENSE") {
-		rename { "${it}_${project.base.archivesName}" }
-	}
+idea {
+    module {
+        excludeDirs.add(file("run"))
+    }
 }
+
