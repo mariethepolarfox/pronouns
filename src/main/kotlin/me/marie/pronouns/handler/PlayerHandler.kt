@@ -72,7 +72,8 @@ object PlayerHandler {
 
     @Subscription(TickEvent::class)
     fun onTick() {
-        queueUncachedPlayers(McLevel.players.map { it.gameProfile })
+        val level = McLevel.selfOrNull ?: return
+        queueUncachedPlayers(level.players().mapNotNull { it.gameProfile }.toList())
     }
 
     @Subscription
