@@ -126,22 +126,11 @@ object PronounDbImpl {
             missingUuids.forEach { uuid ->
                 cache[uuid] = PronounData(listOf(Pronouns.UNKNOWN), Decoration.NONE, now)
             }
-
+            /*
             val foundCount = receivedUuids.size
             val missingCount = missingUuids.size
             val totalCount = uuids.size
-
-            println("Fetched pronoun data for $foundCount/$totalCount UUID(s) from PronounDB")
-            if (missingCount > 0) {
-                println("Cached $missingCount UUID(s) as UNKNOWN (not found in PronounDB)")
-            }
-
-            val message = if (missingCount > 0) {
-                "Fetched $foundCount/$totalCount pronouns ($missingCount not found)"
-            } else {
-                "Fetched $foundCount pronoun(s)"
-            }
-            println(message)
+             */
         }
     }
 
