@@ -1,25 +1,13 @@
+import net.fabricmc.loom.task.ValidateAccessWidenerTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     java
 	idea
+    alias(libs.plugins.kotlin)
 	alias(libs.plugins.loom)
-	alias(libs.plugins.kotlin)
 	alias(libs.plugins.ksp)
     `versioned-catalogues`
-}
-
-version = project.property("mod_version") as String
-group = project.property("maven_group") as String
-
-base {
-	archivesName.set(project.property("archives_base_name") as String)
-}
-
-val targetJavaVersion = 21
-java {
-	toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
-	withSourcesJar()
 }
 
 repositories {
@@ -33,24 +21,23 @@ repositories {
 }
 
 dependencies {
-	minecraft(versionedCatalog["minecraft"])
-	mappings(loom.officialMojangMappings())
-    // loader + fabric kotlin
-	modImplementation(libs.bundles.fabric)
-    // fabricapi
-    modImplementation(versionedCatalog["fabric"])
+    minecraft(versionedCatalog["minecraft"])
 
-	api(libs.skyblockapi) {
-		capabilities { requireCapability("tech.thatgravyboat:skyblock-api-${stonecutter.current.version}") }
-	}
-	include(libs.skyblockapi) {
-		capabilities { requireCapability("tech.thatgravyboat:skyblock-api-${stonecutter.current.version}-remapped") }
-	}
+    implementation(libs.fabricLoader)
+    implementation(versionedCatalog["fabricApi"])
+    implementation(libs.fabricKt)
+
+    api(libs.skyblockapi) {
+        capabilities { requireCapability("tech.thatgravyboat:skyblock-api-${stonecutter.current.version}") }
+    }
+    include(libs.skyblockapi) {
+        capabilities { requireCapability("tech.thatgravyboat:skyblock-api-${stonecutter.current.version}") }
+    }
     api(libs.meowdding.lib) {
         capabilities { requireCapability("me.owdding.meowdding-lib:meowdding-lib-${stonecutter.current.version}") }
     }
     include(libs.meowdding.lib) {
-        capabilities { requireCapability("me.owdding.meowdding-lib:meowdding-lib-${stonecutter.current.version}-remapped") }
+        capabilities { requireCapability("me.owdding.meowdding-lib:meowdding-lib-${stonecutter.current.version}") }
     }
 
     // All needed for mlib rn ?????????
@@ -59,19 +46,19 @@ dependencies {
     includeImplementation(versionedCatalog["placeholders"])
     includeImplementation(versionedCatalog["olympus"])
 
-	modRuntimeOnly(libs.hypixel.modapi.fabric)
+	runtimeOnly(libs.hypixel.modapi.fabric)
 
 	implementation(libs.google.gson)
 
 	compileOnly(libs.meowdding.ktmodules)
 	ksp(libs.meowdding.ktmodules)
 
-	modRuntimeOnly(libs.devauth)
+    implementation(libs.devauth)
 }
 
 fun DependencyHandler.includeImplementation(dep: Any) {
     include(dep)
-    modImplementation(dep)
+    implementation(dep)
 }
 
 ksp {
@@ -79,68 +66,74 @@ ksp {
 	arg("meowdding.modules.package", "me.marie.pronouns.generated")
 }
 
+var accessWidenerFile = rootProject.file("src/pronouns.accesswidener")
 loom {
-	runs {
-		getByName("client") {
-			ideConfigGenerated(true)
-			property("devauth.configDir", rootProject.file(".devauth").absolutePath)
-		}
-	}
+    accessWidenerPath = accessWidenerFile
+    runConfigs["client"].apply {
+        ideConfigGenerated(true)
+        runDir = "../../run"
+        vmArg("-Dfabric.modsFolder=" + '"' + rootProject.projectDir.resolve("run/${stonecutter.current.version.replace(".", "")}Mods").absolutePath + '"')
+        property("devauth.configDir", rootProject.file(".devauth").absolutePath)
+    }
 }
 
 tasks {
     processResources {
+        val range = if (versionedCatalog.versions.has("minecraft.range")) {
+            versionedCatalog.versions["minecraft.range"].toString()
+        } else {
+            val start = versionedCatalog.versions.getOrFallback("minecraft.start", "minecraft")
+            val end = versionedCatalog.versions.getOrFallback("minecraft.end", "minecraft")
+            ">=$start <=$end"
+        }
         inputs.property("version", project.version)
-
-        inputs.property("minecraft_version", versionedCatalog.versions["minecraft"])
-        inputs.property("loader_version", libs.versions.loader.get())
-        filteringCharset = "UTF-8"
+        inputs.property("minecraft_version", range)
+        inputs.property("loader_version", libs.versions.fabricLoader.get())
 
         filesMatching("fabric.mod.json") {
             expand(
                 "version" to project.version,
-                "minecraft_version" to versionedCatalog.versions["minecraft"],
-                "loader_version" to libs.versions.loader.get(),
-                "kotlin_loader_version" to libs.versions.fabrickotlin.get()
+                "loader_version" to libs.versions.fabricLoader.get(),
+                "minecraft_version" to range,
             )
         }
+
+        with(copySpec {
+            from(accessWidenerFile)
+        })
     }
 
     jar {
         from("LICENSE")
+        archiveFileName.set("Pronouns-$version-${stonecutter.current.version}.jar")
     }
 
     compileKotlin {
         compilerOptions {
-            jvmTarget = JvmTarget.JVM_21
-            freeCompilerArgs.addAll(
-                "-opt-in=kotlin.time.ExperimentalTime",
-                "-opt-in=kotlin.uuid.ExperimentalUuidApi",
-                "-Xcontext-parameters",
-                "-Xcontext-sensitive-resolution",
-                "-Xnested-type-aliases"
-            )
+            jvmTarget = JvmTarget.JVM_25
         }
     }
 
     build {
         doLast {
-            val sourceFile = rootProject.projectDir.resolve("versions/${project.name}/build/libs/pronoundb-$version.jar")
-            val targetFile = rootProject.projectDir.resolve("build/libs/pronouns-$version-${stonecutter.current.version}.jar")
+            val sourceFile = rootProject.projectDir.resolve("versions/${project.name}/build/libs/Pronouns-$version-${stonecutter.current.version}.jar")
+            val targetFile = rootProject.projectDir.resolve("build/libs/Pronouns-$version-${stonecutter.current.version}.jar")
             targetFile.parentFile.mkdirs()
             targetFile.writeBytes(sourceFile.readBytes())
         }
     }
 }
 
+tasks.withType<ValidateAccessWidenerTask> { enabled = false }
+
 java {
     withSourcesJar()
-    targetCompatibility = JavaVersion.VERSION_21
-    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_25
+    sourceCompatibility = JavaVersion.VERSION_25
 }
 
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(25)
 }
 
 idea {
@@ -148,4 +141,3 @@ idea {
         excludeDirs.add(file("run"))
     }
 }
-

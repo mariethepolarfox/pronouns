@@ -3,14 +3,14 @@ package me.marie.pronouns.util
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import kotlinx.coroutines.suspendCancellableCoroutine
-import me.marie.pronouns.PronounDbIntegration
+import me.marie.pronouns.Pronouns
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 
 object RequestUtil {
-    private val USER_AGENT = "PronounDBIntegrationMod/${PronounDbIntegration.version.friendlyString} (https://github.com/mariethepolarfox/pronouns)"
+    private val USER_AGENT = "PronounDBIntegrationMod/${Pronouns.version.friendlyString} (https://github.com/mariethepolarfox/pronouns)"
 
     val gson: Gson = GsonBuilder().create()
     private val client = HttpClient.newBuilder().build()
@@ -22,7 +22,7 @@ object RequestUtil {
     suspend fun getString(url: String): Result<String> =
         execRequest(createGetRequest(url))
             .mapCatching { response -> response.body() }
-            .onFailure { PronounDbIntegration.logger.warn("Failed to fetch from $url: ${it.message}") }
+            .onFailure { Pronouns.logger.warn("Failed to fetch from $url: ${it.message}") }
 
     fun createGetRequest(url: String): HttpRequest =
         HttpRequest.newBuilder()
@@ -34,19 +34,19 @@ object RequestUtil {
 
     private suspend fun execRequest(request: HttpRequest): Result<HttpResponse<String>> =
         suspendCancellableCoroutine { continuation ->
-            PronounDbIntegration.logger.info("Executing request to ${request.uri()}")
+            Pronouns.logger.info("Executing request to ${request.uri()}")
 
             val future = client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
 
             continuation.invokeOnCancellation {
-                PronounDbIntegration.logger.info("Cancelling HTTP request to ${request.uri()}")
+                Pronouns.logger.info("Cancelling HTTP request to ${request.uri()}")
                 future.cancel(true)
             }
 
             future.whenComplete { response, error ->
                 if (error != null) {
                     if (continuation.isActive) {
-                        PronounDbIntegration.logger.warn("Request failed for ${request.uri()}: ${error.message}")
+                        Pronouns.logger.warn("Request failed for ${request.uri()}: ${error.message}")
                         continuation.resume(Result.failure(error)) { _, _, _ -> }
                     }
                 } else {

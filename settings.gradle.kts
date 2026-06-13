@@ -6,15 +6,16 @@ pluginManagement {
         mavenCentral()
         maven("https://maven.fabricmc.net/")
         maven("https://maven.kikugie.dev/snapshots")
+        maven("https://maven.teamresourceful.com/repository/maven-public/")
         gradlePluginPortal()
     }
 }
 
 plugins {
-    id("dev.kikugie.stonecutter") version "0.9-beta.1"
+    id("dev.kikugie.stonecutter") version "0.9.5"
 }
 
-val versions = listOf("1.21.11", "1.21.10")
+val versions = listOf("26.1")
 
 stonecutter {
     create(rootProject) {

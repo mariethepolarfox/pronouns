@@ -15,7 +15,7 @@ import tech.thatgravyboat.skyblockapi.api.events.base.Subscription
 import tech.thatgravyboat.skyblockapi.api.events.misc.RegisterCommandsEvent
 
 @Module
-object PronounDbIntegration : ModInitializer {
+object Pronouns : ModInitializer {
     const val MODID = "pronoundb"
 
     val logger: Logger = LogManager.getLogger("PronounDbIntegration")

@@ -2,7 +2,7 @@ package me.marie.pronouns.handler
 
 import com.mojang.authlib.GameProfile
 import com.mojang.blaze3d.vertex.PoseStack
-import me.marie.pronouns.PronounDbIntegration
+import me.marie.pronouns.Pronouns
 import me.marie.pronouns.impl.PronounDbImpl
 import me.marie.pronouns.util.sendPrefixed
 import me.owdding.ktmodules.Module
@@ -10,7 +10,7 @@ import net.minecraft.client.player.AbstractClientPlayer
 import net.minecraft.client.renderer.SubmitNodeCollector
 import net.minecraft.client.renderer.entity.state.AvatarRenderState
 import net.minecraft.client.renderer.entity.state.EntityRenderState
-import net.minecraft.client.renderer.state.CameraRenderState
+import net.minecraft.client.renderer.state.level.CameraRenderState
 import tech.thatgravyboat.skyblockapi.api.events.base.Subscription
 import tech.thatgravyboat.skyblockapi.api.events.hypixel.ServerChangeEvent
 import tech.thatgravyboat.skyblockapi.api.events.misc.RegisterCommandsEvent
@@ -48,7 +48,7 @@ object PlayerHandler {
         cameraState: CameraRenderState,
     ) {
         val renderState = renderState as? AvatarRenderState ?: return
-        val player = renderState.getData(PronounDbIntegration.ENTITY_DATA_KEY) as? AbstractClientPlayer ?: return
+        val player = renderState.getData(Pronouns.ENTITY_DATA_KEY) as? AbstractClientPlayer ?: return
         val id = player.gameProfile.id
 
         if (id.version() != 4) return

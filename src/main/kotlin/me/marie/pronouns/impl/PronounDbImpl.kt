@@ -1,7 +1,7 @@
 package me.marie.pronouns.impl
 
 import com.google.gson.JsonObject
-import me.marie.pronouns.PronounDbIntegration
+import me.marie.pronouns.Pronouns
 import me.marie.pronouns.util.Multithreading
 import me.marie.pronouns.util.RequestUtil
 import me.marie.pronouns.util.sendPrefixed
@@ -49,12 +49,12 @@ object PronounDbImpl {
     fun getPronounExtensionComponent(uuid: UUID) = getPronounExtensionComponent(uuid.toKotlinUuid())
 
     fun getPronounExtensionComponent(uuid: Uuid): Component? {
-        val pronouns = getPronouns(uuid).takeUnless { it == listOf(Pronouns.UNKNOWN) } ?: return null
+        val pronouns = getPronouns(uuid).takeUnless { it == listOf(PronounEnum.UNKNOWN) } ?: return null
         val decoration = getDecoration(uuid) ?: Decoration.NONE
         val gradient = GradientTextShader(decoration.colors)
 
         val displayNames = pronouns.map {
-            val debug = if (PronounDbIntegration.debug) Text.of(" (${cache[uuid]?.since()?.inWholeSeconds ?: "N/A"}s old)") else CommonText.EMPTY
+            val debug = if (Pronouns.debug) Text.of(" (${cache[uuid]?.since()?.inWholeSeconds ?: "N/A"}s old)") else CommonText.EMPTY
             Text.of(it.displayName) {
                 textShader = gradient
                 append(debug)
@@ -64,7 +64,7 @@ object PronounDbImpl {
     }
 
     fun getPronouns(uuid: UUID) = getPronouns(uuid.toKotlinUuid())
-    fun getPronouns(uuid: Uuid): List<Pronouns>? {
+    fun getPronouns(uuid: Uuid): List<PronounEnum>? {
         val cached = cache[uuid] ?: return null
         if (cached.since() >= CACHE_TIMEOUT) {
             cache.remove(uuid)
@@ -124,7 +124,7 @@ object PronounDbImpl {
 
             val missingUuids = uuids.filterNot { it in receivedUuids }
             missingUuids.forEach { uuid ->
-                cache[uuid] = PronounData(listOf(Pronouns.UNKNOWN), Decoration.NONE, now)
+                cache[uuid] = PronounData(listOf(PronounEnum.UNKNOWN), Decoration.NONE, now)
             }
             /*
             val foundCount = receivedUuids.size
@@ -138,26 +138,26 @@ object PronounDbImpl {
         return "https://pronoundb.org/api/v2/lookup?platform=$platform&ids=${uuids.joinToString(",") { it.toString() }}"
     }
 
-    data class PronounData(val pronouns: List<Pronouns>, val decoration: Decoration, val lastUpdated: Instant) {
+    data class PronounData(val pronouns: List<PronounEnum>, val decoration: Decoration, val lastUpdated: Instant) {
         fun since(): Duration = lastUpdated.since()
 
         companion object {
             fun fromJson(json: JsonObject): PronounData {
                 val pronouns = json.getPath("sets.en")?.asJsonArray?.mapNotNull { pronoun ->
                     val pronounStr = pronoun.asString
-                    Pronouns.entries.find { it.name.equals(pronounStr, ignoreCase = true) }
+                    PronounEnum.entries.find { it.name.equals(pronounStr, ignoreCase = true) }
                 } ?: emptyList()
 
                 val decoration = json.getPath("decoration")?.asString?.let { deco ->
                     Decoration.entries.find { it.name.equals(deco, ignoreCase = true) }
                 } ?: Decoration.NONE
 
-                return PronounData(pronouns.ifEmpty { listOf(Pronouns.UNKNOWN) }, decoration, currentInstant())
+                return PronounData(pronouns.ifEmpty { listOf(PronounEnum.UNKNOWN) }, decoration, currentInstant())
             }
         }
     }
 
-    enum class Pronouns(val displayName: String) {
+    enum class PronounEnum(val displayName: String) {
         SHE("she/her"),
         HE("he/him"),
         IT("it/its"),
