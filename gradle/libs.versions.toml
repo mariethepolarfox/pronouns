@@ -1,12 +1,11 @@
 [versions]
 fabricLoader = "0.19.3"
 fabricKt = "1.13.12+kotlin.2.4.0"
-loom = "1.16-SNAPSHOT"
+loom = "1.17-SNAPSHOT"
 
 meowdding-ktmodules = "1.0.8"
-skyblockapi = "4.1.13"
-meowdding-lib = "4.1.7"
-hypixel-modapi-fabric = "1.0.1+build.1+mc1.21"
+skyblockapi = "4.2.8"
+meowdding-lib = "4.2.5"
 
 kotlin = "2.4.0"
 ksp = "2.3.6"
@@ -22,7 +21,6 @@ fabricKt = { module = "net.fabricmc:fabric-language-kotlin", version.ref = "fabr
 skyblockapi = { module = "tech.thatgravyboat:skyblock-api", version.ref = "skyblockapi" }
 meowdding-lib = { module = "me.owdding.meowdding-lib:meowdding-lib", version.ref = "meowdding-lib" }
 meowdding-ktmodules = { module = "me.owdding.ktmodules:KtModules", version.ref = "meowdding-ktmodules" }
-hypixel-modapi-fabric = { module = "maven.modrinth:hypixel-mod-api", version.ref = "hypixel-modapi-fabric" }
 
 google-gson = { module = "com.google.code.gson:gson", version.ref = "google-gson" }
 

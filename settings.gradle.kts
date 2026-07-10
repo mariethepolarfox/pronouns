@@ -1,4 +1,3 @@
-
 rootProject.name = "Pronouns"
 
 pluginManagement {
@@ -12,10 +11,10 @@ pluginManagement {
 }
 
 plugins {
-    id("dev.kikugie.stonecutter") version "0.9.5"
+    id("dev.kikugie.stonecutter") version "0.10-alpha.3"
 }
 
-val versions = listOf("26.1")
+val versions = listOf("26.2", "26.1")
 
 stonecutter {
     create(rootProject) {

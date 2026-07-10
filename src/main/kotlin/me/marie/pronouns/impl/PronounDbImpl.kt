@@ -126,11 +126,6 @@ object PronounDbImpl {
             missingUuids.forEach { uuid ->
                 cache[uuid] = PronounData(listOf(PronounEnum.UNKNOWN), Decoration.NONE, now)
             }
-            /*
-            val foundCount = receivedUuids.size
-            val missingCount = missingUuids.size
-            val totalCount = uuids.size
-             */
         }
     }
 

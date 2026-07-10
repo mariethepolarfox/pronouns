@@ -46,7 +46,7 @@ dependencies {
     includeImplementation(versionedCatalog["placeholders"])
     includeImplementation(versionedCatalog["olympus"])
 
-	runtimeOnly(libs.hypixel.modapi.fabric)
+	runtimeOnly(versionedCatalog["hypixel.modapi.fabric"])
 
 	implementation(libs.google.gson)
 
@@ -70,10 +70,10 @@ var accessWidenerFile = rootProject.file("src/pronouns.accesswidener")
 loom {
     accessWidenerPath = accessWidenerFile
     runConfigs["client"].apply {
-        ideConfigGenerated(true)
-        runDir = "../../run"
-        vmArg("-Dfabric.modsFolder=" + '"' + rootProject.projectDir.resolve("run/${stonecutter.current.version.replace(".", "")}Mods").absolutePath + '"')
-        property("devauth.configDir", rootProject.file(".devauth").absolutePath)
+        generateRunConfig = true
+        runDirectory = project.file("../../run")
+        jvmArguments.add("-Dfabric.modsFolder=" + '"' + rootProject.projectDir.resolve("run/${stonecutter.current.version.replace(".", "")}Mods").absolutePath + '"')
+        systemProperties.put("devauth.configDir", rootProject.file(".devauth").absolutePath)
     }
 }
 

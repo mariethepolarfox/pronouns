@@ -64,7 +64,8 @@ object PlayerHandler {
             comp,
             !renderState.isDiscrete,
             renderState.lightCoords,
-            renderState.distanceToCameraSq,
+            //? if < 26.2
+            //renderState.distanceToCameraSq,
             cameraState,
         )
         poseStack.popPose()
@@ -76,8 +77,8 @@ object PlayerHandler {
         queueUncachedPlayers(level.players().mapNotNull { it.gameProfile }.toList())
     }
 
-    @Subscription
-    fun onWorldJoin(event: ServerChangeEvent) {
+    @Subscription(ServerChangeEvent::class)
+    fun onWorldJoin() {
         PronounDbImpl.lastRequest = currentInstant()
     }
 

@@ -34,7 +34,7 @@ object RequestUtil {
 
     private suspend fun execRequest(request: HttpRequest): Result<HttpResponse<String>> =
         suspendCancellableCoroutine { continuation ->
-            Pronouns.logger.info("Executing request to ${request.uri()}")
+            if (Pronouns.debug) Pronouns.logger.info("Executing request to ${request.uri()}")
 
             val future = client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
 
