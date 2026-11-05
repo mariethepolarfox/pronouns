@@ -1,0 +1,22 @@
+[versions]
+minecraft = "26.3"
+minecraft-start = "26.3"
+minecraft-end = "26.3"
+fabricApi = "0.165.2+26.3"
+
+hypixel-modapi-fabric = "1.0.2+build.1+mc26.1"
+resourceful-lib = "6.0.1"
+resourceful-config = "6.0.2"
+olympus = "1.9.8"
+placeholders = "3.2.0+26.3"
+
+[libraries]
+
+minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }
+fabricApi = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fabricApi" }
+
+hypixel-modapi-fabric = { module = "maven.modrinth:hypixel-mod-api", version.ref = "hypixel-modapi-fabric" }
+resourceful-lib = { module = "com.teamresourceful.resourcefullib:resourcefullib-fabric-26.3", version.ref = "resourceful-lib" }
+resourceful-config = { module = "com.teamresourceful.resourcefulconfig:resourcefulconfig-fabric-26.3", version.ref = "resourceful-config" }
+olympus = { module = "earth.terrarium.olympus:olympus-fabric-26.3", version.ref = "olympus" }
+placeholders = { module = "eu.pb4:placeholder-api", version.ref = "placeholders" }

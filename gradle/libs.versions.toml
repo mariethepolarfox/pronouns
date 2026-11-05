@@ -1,15 +1,15 @@
 [versions]
-fabricLoader = "0.19.3"
-fabricKt = "1.13.12+kotlin.2.4.0"
-loom = "1.17-SNAPSHOT"
+fabricLoader = "0.20.1"
+fabricKt = "1.14.2+kotlin.2.4.21"
+loom = "1.19-SNAPSHOT"
 
-meowdding-ktmodules = "1.0.8"
-skyblockapi = "4.2.8"
-meowdding-lib = "4.2.5"
+meowdding-ktmodules = "1.0.9"
+skyblockapi = "4.3.0"
+meowdding-lib = "4.3.2"
 
-kotlin = "2.4.0"
-ksp = "2.3.6"
-google-gson = "2.14.0"
+kotlin = "2.4.21"
+ksp = "2.3.13"
+google-gson = "2.15.0"
 
 devauth = "1.2.2"
 

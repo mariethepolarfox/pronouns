@@ -72,7 +72,6 @@ loom {
     runConfigs["client"].apply {
         generateRunConfig = true
         runDirectory = project.file("../../run")
-        jvmArguments.add("-Dfabric.modsFolder=" + '"' + rootProject.projectDir.resolve("run/${stonecutter.current.version.replace(".", "")}Mods").absolutePath + '"')
         systemProperties.put("devauth.configDir", rootProject.file(".devauth").absolutePath)
     }
 }

@@ -2,12 +2,12 @@
 minecraft = "26.2"
 minecraft-start = "26.2"
 minecraft-end = "26.2"
-fabricApi = "0.154.2+26.2"
+fabricApi = "0.161.0+26.2"
 
 hypixel-modapi-fabric = "1.0.2+build.1+mc26.1"
-resourceful-lib = "5.0.1"
+resourceful-lib = "5.0.4"
 resourceful-config = "5.0.0"
-olympus = "1.9.0"
+olympus = "1.9.4"
 placeholders = "3.1.0-beta.1+26.2"
 
 [libraries]
